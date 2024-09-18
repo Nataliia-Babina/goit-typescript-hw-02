@@ -8,16 +8,25 @@ import { Toaster } from 'react-hot-toast';
 import { fetchData } from './API';
 import { ErrorMessage } from './ErrorMessage/ErrorMessage';
 
-export const App = () => {
-  const [query, setQuery] = useState('');
-  const [page, setPage] = useState(1);
-  const [photos, setPhotos] = useState([]);
-  const [error, setError] = useState('');
-  const [loading, setLoading] = useState(false);
-  const [modalIsOpen, setModalIsOpen] = useState(false);
-  const [selectedPhoto, setSelectedPhoto] = useState(null);
+type Photo = {
+  id: string;
+  urls: {
+    regular: string;
+    small: string;
+  };
+  alt_description: string;
+};
 
-  const searchPhotos = async (newQuery) => {
+export const App: React.FC = () => {
+  const [query, setQuery] = useState<string>('');
+  const [page, setPage] = useState<number>(1);
+  const [photos, setPhotos] = useState<Photo[]>([]);
+  const [error, setError] = useState<string>('');
+  const [loading, setLoading] = useState<boolean>(false);
+  const [modalIsOpen, setModalIsOpen] = useState<boolean>(false);
+  const [selectedPhoto, setSelectedPhoto] = useState<Photo | null>(null);
+
+  const searchPhotos = async (newQuery: string) => {
     setQuery(newQuery);
     setPage(1);
     setPhotos([]);
@@ -34,7 +43,7 @@ export const App = () => {
     }, 500);
   };
 
-  const openModal = (photo) => {
+  const openModal = (photo: Photo) => {
     setSelectedPhoto(photo);
     setModalIsOpen(true);
   };
@@ -52,9 +61,13 @@ export const App = () => {
 
       setLoading(true); 
       try {
-        await fetchData(query, page, setPhotos, setLoading, setError);
+        await fetchData({ query, page, setPhotos, setLoading, setError });
       } catch (error) {
-        setError(error.message);
+        if (error instanceof Error) {
+          setError(error.message);
+           } else {
+          setError('An unknown error occurred');
+        }
       } finally {
         setLoading(false); 
       }

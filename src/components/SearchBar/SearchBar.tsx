@@ -1,16 +1,25 @@
 import css from "./SearchBar.module.css";
 import { IoIosSearch } from "react-icons/io";
 import toast from "react-hot-toast";
+import { FormEvent } from "react";
 
-export const SearchBox = ({ onSearch }) => {
-  const handleSubmit = (event) => {
+interface SearchBoxProps {
+  onSearch: (query: string) => void;
+}
+
+export const SearchBox: React.FC<SearchBoxProps> = ({ onSearch }) => {
+  const handleSubmit = (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    if (event.target.elements.query.value.trim() === '') {
-        toast.error("Enter text for search!");
-        return;  
+     const form = event.target as HTMLFormElement;
+    const query = (form.elements.namedItem('query') as HTMLInputElement).value.trim();
+    
+     if (query === '') {
+      toast.error("Enter text for search!");
+      return;
     }
-    onSearch(event.target.elements.query.value.trim());
-    event.target.reset();
+
+    onSearch(query);
+    form.reset();
   };
 
   return (
